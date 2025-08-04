@@ -1,10 +1,12 @@
 use std::collections::HashSet;
+use serde::{Deserialize, Serialize};
 use crate::error::ContactBookError;
 use crate::models::contact::{TagType, Contact};
 use crate::utils::is_valid_email;
 
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ContactBook {
-    contacts: Vec<Contact>
+    pub contacts: Vec<Contact>
 }
 
 impl ContactBook {
@@ -42,8 +44,16 @@ impl ContactBook {
     pub fn find_all_by_tags(&self, tag: &TagType) -> Vec<&Contact> {
         self.contacts.iter().filter(|c| c.tags.contains(tag)).collect()
     }
+    
+    pub fn add_contact(&mut self, contact: Contact) -> Result<&Contact, ContactBookError> {
+        if self.find_contact_index(&contact.name).is_some() {
+            return Err(ContactBookError::ContactAlreadyExists);
+        }
+        self.contacts.push(contact);
+        Ok(self.contacts.last().expect("Just pushed; should never be None"))
+    }
 
-    pub fn add_new_contact(&mut self, name: &str, email: &str, phone_numbers: Option<Vec<&str>>, tags: Option<HashSet<TagType>>) -> Result<&Contact, ContactBookError> {
+    pub fn create_new_contact(&mut self, name: &str, email: &str, phone_numbers: Option<Vec<&str>>, tags: Option<HashSet<TagType>>) -> Result<&Contact, ContactBookError> {
         if !is_valid_email(email) {
             return Err(ContactBookError::InvalidEmailFormat)
         }

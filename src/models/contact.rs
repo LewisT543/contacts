@@ -1,9 +1,11 @@
 use std::collections::HashSet;
 
+use serde::{Serialize, Deserialize};
+
 use crate::error::ContactBookError;
 
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, Serialize, Deserialize)]
 pub enum TagType {
     Work,
     Home,
@@ -21,6 +23,7 @@ impl std::fmt::Display for TagType {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Contact {
     pub name: String,
     pub email: String,
